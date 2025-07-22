@@ -1,0 +1,59 @@
+﻿@page "/"
+@inherits Home
+
+<PageTitle>Documentos</PageTitle>
+
+<h3>Documentos</h3>
+
+<input class="form-control mb-3" placeholder="Buscar por código o descripción..." @bind="SearchText" @bind:event="oninput" />
+
+@if (isLoading)
+{
+    <p>Cargando...</p>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (FilteredDocumentos.Count == 0)
+{
+    <p>No hay documentos para mostrar.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Activa</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doc in PagedDocumentos)
+            {
+                <tr>
+                    <td>@(HighlightText(doc.Codigo.ToString(), SearchText))</td>
+                    <td>@(HighlightText(doc.Descripcion ?? string.Empty, SearchText))</td>
+                    <td>@(doc.VActiva ? "Sí" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : null)">
+                <button class="page-link" @onclick="PreviousPage">Anterior</button>
+            </li>
+            @for (int i = 1; i <= TotalPages; i++)
+            {
+                <li class="page-item @(CurrentPage == i ? "active" : null)">
+                    <button class="page-link" @onclick="(() => GoToPage(i))">@i</button>
+                </li>
+            }
+            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : null)">
+                <button class="page-link" @onclick="NextPage">Siguiente</button>
+            </li>
+        </ul>
+    </nav>
+}
